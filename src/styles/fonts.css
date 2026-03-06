@@ -1,0 +1,15 @@
+/* Neo-Brutalist Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+}
+
+.font-mono, code, pre {
+  font-family: 'Space Mono', monospace;
+}

@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  /* 90s Vaporwave Airy Palette */
+  --color-bg: #f8fafc;
+  --color-lavender: #e2e8f0;
+  --color-mint: #f0fdf4;
+  --color-candy-pink: #fdf2f8;
+  --color-lemon: #fefce8;
+  
+  --color-accent: #6366f1; /* Pastel Indigo */
+  --color-text: #1e293b;
+  --color-text-dim: #64748b;
+  
+  --shadow-airy: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-float: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  --font-main: 'Plus Jakarta Sans', sans-serif;
+  --font-heading: 'Syne', sans-serif;
+  
+  --radius-soft: 12px;
+  --negative-space: 2rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.airy-canvas {
+  flex: 1;
+  background: radial-gradient(circle at 50% 50%, var(--color-mint) 0%, var(--color-bg) 100%);
+  padding: var(--negative-space);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.staple-palette {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  padding: 12px;
+  border-radius: 40px;
+  box-shadow: var(--shadow-airy);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  cursor: grab;
+}
+
+.color-dot {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.color-dot:hover {
+  transform: scale(1.1);
+}
+
+.bg-checkered {
+  background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
