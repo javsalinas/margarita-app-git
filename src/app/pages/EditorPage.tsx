@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Upload, Copy, Check, X, Download, Type, Sparkles, LayoutGrid, Layers, Trash2 } from 'lucide-react';
+import { ArrowLeft, Upload, Copy, Check, X, Download, Type, Sparkles, LayoutGrid, Layers, Trash2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { extractColorsFromImage } from '../utils/colorExtractor';
 import { saveProject, getProject, getUser } from '../utils/storage';

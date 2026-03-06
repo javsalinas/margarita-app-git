@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 export interface Project {
   id: string;
   name: string;
@@ -9,44 +11,55 @@ export interface Project {
   updatedAt: number;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
-
 const STORAGE_KEYS = {
-  USER: 'margarita_user',
   PROJECTS: 'margarita_projects',
 };
 
-// User Storage
-export function saveUser(user: User): void {
-  localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+/**
+ * Persistencia en Supabase (Nube)
+ */
+export async function saveProjectCloud(project: any) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('projects')
+    .upsert({
+      id: project.id,
+      user_id: user.id,
+      name: project.name,
+      image_url: project.thumbnail, // En fase 3.1 subiremos a Storage
+      colors: project.colors,
+      format: project.format,
+      palette_position: project.palettePosition,
+      updated_at: new Date().toISOString()
+    })
+    .select();
+
+  if (error) throw error;
+  return data;
 }
 
-export function getUser(): User | null {
-  const data = localStorage.getItem(STORAGE_KEYS.USER);
-  return data ? JSON.parse(data) : null;
+export async function getProjectsCloud() {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('updated_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
 }
 
-export function clearUser(): void {
-  localStorage.removeItem(STORAGE_KEYS.USER);
-}
-
-// Projects Storage
-export function saveProjects(projects: Project[]): void {
-  localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
-}
-
-export function getProjects(): Project[] {
+/**
+ * Persistencia Local (Legacy / Guest Mode)
+ */
+export function getProjectsLocal(): Project[] {
   const data = localStorage.getItem(STORAGE_KEYS.PROJECTS);
   return data ? JSON.parse(data) : [];
 }
 
-export function saveProject(project: Project): void {
-  const projects = getProjects();
+export function saveProjectLocal(project: Project): void {
+  const projects = getProjectsLocal();
   const index = projects.findIndex(p => p.id === project.id);
   
   if (index >= 0) {
@@ -55,15 +68,11 @@ export function saveProject(project: Project): void {
     projects.push(project);
   }
   
-  saveProjects(projects);
+  localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
 }
 
-export function deleteProject(projectId: string): void {
-  const projects = getProjects().filter(p => p.id !== projectId);
-  saveProjects(projects);
-}
-
-export function getProject(projectId: string): Project | null {
-  const projects = getProjects();
-  return projects.find(p => p.id === projectId) || null;
+// Helper para obtener el usuario actual
+export async function getCurrentUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
 }
