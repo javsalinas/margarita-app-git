@@ -3,49 +3,51 @@
 :root {
   --font-size: 16px;
   
-  /* Neo-Brutalist Color Palette */
-  --background: #FAF3DD; /* Crema Suave */
-  --foreground: #000000; /* Negro puro */
-  --card: #FAF3DD;
-  --card-foreground: #000000;
-  --popover: #FAF3DD;
-  --popover-foreground: #000000;
-  --primary: #F4C152; /* Amarillo Sólido */
-  --primary-foreground: #000000;
-  --secondary: #B7E4C7; /* Verde Menta Pastel */
-  --secondary-foreground: #000000;
-  --muted: #FAF3DD;
-  --muted-foreground: #000000;
-  --accent: #F4C152;
-  --accent-foreground: #000000;
-  --destructive: #FF6B6B;
-  --destructive-foreground: #000000;
-  --border: #000000; /* Bordes negros sólidos */
-  --input: #000000;
-  --input-background: #FFFFFF;
-  --switch-background: #000000;
-  --font-weight-medium: 700;
-  --font-weight-normal: 400;
-  --ring: #000000;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 4px; /* Corner radius mínimo */
-  --sidebar: #B7E4C7; /* Verde Menta */
-  --sidebar-foreground: #000000;
-  --sidebar-primary: #000000;
-  --sidebar-primary-foreground: #FAF3DD;
-  --sidebar-accent: #F4C152;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #000000;
-  --sidebar-ring: #000000;
+  /* Vaporwave Airy Color Palette */
+  --background: #FCFBFF; /* Blanco con un toque lavanda */
+  --foreground: #1D1D1F; /* Gris oscuro Apple style */
+  --card: #FFFFFF;
+  --card-foreground: #1D1D1F;
+  --popover: #FFFFFF;
+  --popover-foreground: #1D1D1F;
   
-  /* Hard Shadow */
-  --shadow-brutal: 4px 4px 0px #000000;
-  --shadow-brutal-sm: 2px 2px 0px #000000;
-  --shadow-brutal-lg: 6px 6px 0px #000000;
+  --primary: #9291FF; /* Periwinkle Principal */
+  --primary-foreground: #FFFFFF;
+  
+  --secondary: #E9E9FF; /* Lavender Suave */
+  --secondary-foreground: #6362D7;
+  
+  --muted: #F5F5F7;
+  --muted-foreground: #86868B;
+  
+  --accent: #D7D6FF; /* Lavender/Periwinkle Accent */
+  --accent-foreground: #6362D7;
+  
+  --destructive: #FF453A;
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #E5E5E7; /* Borde sutil */
+  --input: #E5E5E7;
+  --input-background: #F5F5F7;
+  
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+  --ring: #9291FF;
+  
+  --radius: 16px; /* Corner radius más suave */
+  
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1D1D1F;
+  --sidebar-primary: #9291FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E9E9FF;
+  --sidebar-accent-foreground: #6362D7;
+  --sidebar-border: #E5E5E7;
+  --sidebar-ring: #9291FF;
+  
+  /* Soft Shadows */
+  --shadow-airy: 0 4px 24px -1px rgba(0, 0, 0, 0.05), 0 2px 8px -1px rgba(0, 0, 0, 0.03);
+  --shadow-airy-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
 }
 
 .dark {

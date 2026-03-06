@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Upload, Copy, Check, X, Download, Type, Sparkles, LayoutGrid, Layers, Trash2, Plus } from 'lucide-react';
+import { ArrowLeft, Upload, Copy, Check, Download, Type, Sparkles, Layers, Plus, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { extractColorsFromImage } from '../utils/colorExtractor';
 import { saveProject, getProject, getUser } from '../utils/storage';
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 // UI Components from base repo
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -197,11 +197,11 @@ export default function EditorPage() {
 
     return (
         <TooltipProvider>
-            <div className="min-h-screen bg-[#FDFCFB] text-[#1D1D1F]">
+            <div className="min-h-screen bg-[#FCFBFF] text-[#1D1D1F]">
                 {/* Header Superior (Moderno & Airy) */}
-                <header className="h-16 border-b border-[#E5E5E7] bg-white/70 backdrop-blur-xl sticky top-0 z-40 flex items-center px-6">
+                <header className="h-16 border-b border-[#E5E5E7] bg-white sticky top-0 z-40 flex items-center px-6">
                     <div className="flex items-center gap-4 flex-1">
-                        <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate('/home')}>
+                        <Button variant="ghost" size="icon" className="rounded-full hover:bg-[#F5F5F7]" onClick={() => navigate('/home')}>
                             <ArrowLeft className="w-5 h-5" />
                         </Button>
                         <div className="h-4 w-[1px] bg-[#E5E5E7] mx-1" />
@@ -210,27 +210,27 @@ export default function EditorPage() {
                             onChange={(e) => setProjectName(e.target.value)}
                             className="bg-transparent border-none focus-visible:ring-0 text-sm font-semibold h-8 w-48 p-0"
                         />
-                        <Badge variant="secondary" className="bg-purple-50 text-purple-600 border-none font-bold text-[10px]">VERSIÓN 2.0</Badge>
+                        <Badge variant="secondary" className="bg-[#E9E9FF] text-[#6362D7] border-none font-bold text-[10px] px-2 py-0">PRO</Badge>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="rounded-full border-[#E5E5E7] text-xs font-bold" onClick={handleSave}>
+                        <Button variant="ghost" size="sm" className="rounded-full text-xs font-bold text-[#86868B] hover:text-[#1D1D1F]" onClick={handleSave}>
                             Guardar borrador
                         </Button>
-                        <Button size="sm" className="rounded-full bg-[#1D1D1F] text-white text-xs font-bold px-6 hover:bg-black transition-all">
+                        <Button size="sm" className="rounded-full bg-[#9291FF] text-white text-xs font-bold px-6 hover:bg-[#7A79E6] transition-all shadow-sm">
                             Exportar <Download className="w-3 h-3 ml-2" />
                         </Button>
                     </div>
                 </header>
 
-                {/* Área Principal (Lienzo Central + Paneles Flotantes) */}
+                {/* Área Principal */}
                 <main className="h-[calc(100vh-64px)] relative flex overflow-hidden">
                     
-                    {/* Panel Lateral Izquierdo (Herramientas Rápidas) */}
+                    {/* Panel Lateral Izquierdo */}
                     <aside className="w-16 border-r border-[#E5E5E7] flex flex-col items-center py-6 gap-6 bg-white">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50" onClick={() => setIsFontLabOpen(true)}>
+                                <Button variant="ghost" size="icon" className="rounded-xl text-[#86868B] hover:text-[#9291FF] hover:bg-[#E9E9FF]" onClick={() => setIsFontLabOpen(true)}>
                                     <Type className="w-5 h-5" />
                                 </Button>
                             </TooltipTrigger>
@@ -239,7 +239,7 @@ export default function EditorPage() {
                         
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50" onClick={() => fileInputRef.current?.click()}>
+                                <Button variant="ghost" size="icon" className="rounded-xl text-[#86868B] hover:text-[#9291FF] hover:bg-[#E9E9FF]" onClick={() => fileInputRef.current?.click()}>
                                     <ImageIcon className="w-5 h-5" />
                                 </Button>
                             </TooltipTrigger>
@@ -250,7 +250,7 @@ export default function EditorPage() {
 
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50">
+                                <Button variant="ghost" size="icon" className="rounded-xl text-[#86868B] hover:text-[#9291FF] hover:bg-[#E9E9FF]">
                                     <Layers className="w-5 h-5" />
                                 </Button>
                             </TooltipTrigger>
@@ -259,18 +259,18 @@ export default function EditorPage() {
                     </aside>
 
                     {/* Canvas (Lienzo) de Edición */}
-                    <div className="flex-1 bg-[#F5F5F7] p-12 flex items-center justify-center overflow-auto">
-                        <div className="relative flex flex-col items-center gap-6">
+                    <div className="flex-1 bg-[#F9F9FB] p-12 flex items-center justify-center overflow-auto">
+                        <div className="relative flex flex-col items-center gap-8">
                             {/* Format Selector Flotante */}
-                            <div className="bg-white/80 backdrop-blur-md p-1 rounded-full border border-[#E5E5E7] shadow-sm flex gap-1">
+                            <div className="bg-white p-1 rounded-full border border-[#E5E5E7] shadow-sm flex gap-1">
                                 {(['9:16', '1:1', '4:5'] as Format[]).map((f) => (
                                     <button
                                         key={f}
                                         onClick={() => setFormat(f)}
-                                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                        className={`px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
                                             format === f 
-                                            ? 'bg-[#1D1D1F] text-white shadow-lg' 
-                                            : 'text-[#86868B] hover:bg-white'
+                                            ? 'bg-[#9291FF] text-white shadow-md' 
+                                            : 'text-[#86868B] hover:bg-[#F5F5F7]'
                                         }`}
                                     >
                                         {f === '9:16' ? 'Story' : f === '1:1' ? 'Square' : 'Feed'}
@@ -279,24 +279,23 @@ export default function EditorPage() {
                             </div>
 
                             {/* El Lienzo Propiamente Dicho */}
-                            <div className="bg-white p-12 rounded-[60px] shadow-[0_40px_100px_rgba(0,0,0,0.08)] border border-white">
+                            <div className="bg-white p-1 rounded-[42px] shadow-[0_20px_50px_rgba(146,145,255,0.1)] border border-[#E5E5E7]">
                                 <div
                                     ref={canvasRef}
-                                    className={`relative ${getCanvasAspectRatio()} w-[360px] bg-[#F5F5F7] rounded-[40px] shadow-inner overflow-hidden border border-[#E5E5E7] group transition-all duration-500`}
+                                    className={`relative ${getCanvasAspectRatio()} w-[360px] bg-[#F5F5F7] rounded-[40px] overflow-hidden group transition-all duration-500`}
                                     onMouseMove={handlePaletteDrag}
                                     onTouchMove={handlePaletteDrag}
                                     onMouseUp={handleLongPressEnd}
                                     onTouchEnd={handleLongPressEnd}
                                 >
-                                    {/* Imagen de Fondo */}
                                     {image ? (
-                                        <img src={image} alt="Canvas" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                        <img src={image} alt="Canvas" className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex flex-col items-center justify-center text-[#86868B] gap-4" onClick={() => fileInputRef.current?.click()}>
-                                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
-                                                <Upload className="w-6 h-6 opacity-30" />
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-[#86868B] gap-4 bg-white" onClick={() => fileInputRef.current?.click()}>
+                                            <div className="w-16 h-16 rounded-full bg-[#F5F5F7] flex items-center justify-center">
+                                                <Upload className="w-6 h-6 opacity-40" />
                                             </div>
-                                            <p className="text-xs font-semibold tracking-tight uppercase">Sube tu imagen maestra</p>
+                                            <p className="text-[10px] font-bold tracking-widest uppercase">Subir imagen</p>
                                         </div>
                                     )}
 
@@ -312,7 +311,7 @@ export default function EditorPage() {
                                             {colors.map((color, idx) => (
                                                 <motion.div
                                                     key={idx}
-                                                    className="w-11 h-11 rounded-full border-[3px] border-white shadow-xl"
+                                                    className="w-10 h-10 rounded-full border-[3px] border-white shadow-lg"
                                                     style={{ backgroundColor: color }}
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}
@@ -322,10 +321,10 @@ export default function EditorPage() {
                                             <AnimatePresence>
                                                 {isDragging && (
                                                     <motion.div 
-                                                        initial={{ opacity: 0, scale: 0.8 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.8 }}
-                                                        className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-[#1D1D1F] text-white text-[9px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-xl"
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: 10 }}
+                                                        className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-[#1D1D1F] text-white text-[9px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap shadow-xl"
                                                     >
                                                         REPOSICIONANDO
                                                     </motion.div>
@@ -338,31 +337,30 @@ export default function EditorPage() {
                         </div>
                     </div>
 
-                    {/* Panel Lateral Derecho (Detalles e Historial) */}
+                    {/* Panel Lateral Derecho */}
                     <aside className="w-80 border-l border-[#E5E5E7] bg-white flex flex-col overflow-auto">
-                        <div className="p-8 space-y-8">
+                        <div className="p-8 space-y-10">
                             
-                            {/* Sección: Carga de Imagen */}
                             <section>
-                                <h3 className="text-[11px] font-bold text-[#86868B] uppercase tracking-widest mb-4">Lienzo Principal</h3>
-                                <Card className="border-[#E5E5E7] shadow-none bg-[#F5F5F7] rounded-2xl overflow-hidden group">
+                                <h3 className="text-[10px] font-bold text-[#86868B] uppercase tracking-[0.2em] mb-4">Imagen Maestra</h3>
+                                <Card className="border-[#E5E5E7] shadow-none bg-[#F5F5F7] rounded-3xl overflow-hidden group border-dashed hover:border-[#9291FF] transition-colors">
                                     <CardContent className="p-0">
                                         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                         <button 
-                                            className="w-full h-32 flex flex-col items-center justify-center gap-2 hover:bg-white transition-all text-[#86868B]"
+                                            className="w-full h-40 flex flex-col items-center justify-center gap-2 hover:bg-white transition-all text-[#86868B]"
                                             onClick={() => fileInputRef.current?.click()}
                                         >
                                             {image ? (
                                                 <div className="relative w-full h-full group">
-                                                    <img src={image} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
-                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/20">
-                                                        <Sparkles className="text-[#1D1D1F]" />
+                                                    <img src={image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-[#9291FF]/10">
+                                                        <Sparkles className="text-[#9291FF]" />
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <Upload size={24} className="opacity-20" />
-                                                    <span className="text-[10px] font-bold">CARGAR IMAGEN</span>
+                                                    <Upload size={20} className="opacity-40" />
+                                                    <span className="text-[10px] font-bold">IMPORTAR</span>
                                                 </>
                                             )}
                                         </button>
@@ -370,51 +368,49 @@ export default function EditorPage() {
                                 </Card>
                             </section>
 
-                            {/* Sección: Paleta Extraída */}
                             {colors.length > 0 && (
                                 <section>
-                                    <h3 className="text-[11px] font-bold text-[#86868B] uppercase tracking-widest mb-4">Muestras de Color</h3>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <h3 className="text-[10px] font-bold text-[#86868B] uppercase tracking-[0.2em] mb-4">Paleta de Color</h3>
+                                    <div className="grid grid-cols-2 gap-3">
                                         {colors.map((color, idx) => (
                                             <button
                                                 key={idx}
-                                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#F5F5F7] transition-all group border border-transparent hover:border-[#E5E5E7]"
+                                                className="flex items-center gap-3 p-2 rounded-2xl hover:bg-[#F5F5F7] transition-all group border border-transparent hover:border-[#E5E5E7]"
                                                 onClick={() => handleColorClick(color)}
                                             >
-                                                <div className="w-8 h-8 rounded-full shadow-sm border border-white" style={{ backgroundColor: color }} />
-                                                <span className="text-[10px] font-mono font-bold text-slate-400 group-hover:text-[#1D1D1F]">{color}</span>
+                                                <div className="w-7 h-7 rounded-full shadow-sm border border-white" style={{ backgroundColor: color }} />
+                                                <span className="text-[10px] font-mono font-bold text-[#86868B] group-hover:text-[#1D1D1F]">{color}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </section>
                             )}
 
-                            {/* Sección: Sticker History */}
                             <section>
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-[11px] font-bold text-[#86868B] uppercase tracking-widest">Motor Caligráfico</h3>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsFontLabOpen(true)}><Plus size={14}/></Button>
+                                    <h3 className="text-[10px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Stickers Caligráficos</h3>
+                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-[#E9E9FF] text-[#9291FF]" onClick={() => setIsFontLabOpen(true)}><Plus size={14}/></Button>
                                 </div>
                                 
                                 {stickers.length > 0 ? (
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-2 gap-4">
                                         {stickers.map((sticker, idx) => (
                                             <div 
                                                 key={idx} 
-                                                className="aspect-square bg-[#F5F5F7] rounded-2xl flex items-center justify-center p-3 relative group cursor-pointer hover:bg-white border border-transparent hover:border-[#E5E5E7] transition-all"
+                                                className="aspect-square bg-[#F5F5F7] rounded-3xl flex items-center justify-center p-4 relative group cursor-pointer hover:bg-white border border-transparent hover:border-[#E5E5E7] transition-all shadow-sm"
                                                 onClick={() => downloadSticker(sticker)}
                                             >
                                                 <img src={sticker} alt="Sticker" className="max-w-full max-h-full object-contain" />
                                                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Download className="w-3 h-3 text-slate-400" />
+                                                    <Download className="w-3 h-3 text-[#9291FF]" />
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-8 border border-dashed border-[#E5E5E7] rounded-3xl flex flex-col items-center gap-3 text-center">
-                                        <Type size={20} className="text-[#E5E5E7]" />
-                                        <p className="text-[10px] font-bold text-[#86868B] uppercase leading-relaxed">Genera tus stickers con tipografía propia</p>
+                                    <div className="p-10 border border-dashed border-[#E5E5E7] rounded-[32px] flex flex-col items-center gap-3 text-center bg-[#F9F9FB]">
+                                        <Type size={24} className="text-[#D1D1D6]" />
+                                        <p className="text-[10px] font-bold text-[#86868B] uppercase leading-relaxed">Sin stickers generados</p>
                                     </div>
                                 )}
                             </section>
@@ -423,14 +419,14 @@ export default function EditorPage() {
                     </aside>
                 </main>
 
-                {/* Font Lab Modal (Dialog de Radix) */}
+                {/* Font Lab Modal */}
                 <Dialog open={isFontLabOpen} onOpenChange={setIsFontLabOpen}>
-                    <DialogContent className="max-w-4xl p-0 border-none rounded-[40px] overflow-hidden bg-white shadow-[0_50px_100px_rgba(0,0,0,0.2)]">
+                    <DialogContent className="max-w-4xl p-0 border-none rounded-[32px] overflow-hidden bg-white shadow-2xl">
                         <div className="flex flex-col md:flex-row h-[550px]">
                             {/* Previsualización */}
-                            <div className="flex-1 bg-[#1D1D1F] flex items-center justify-center relative p-12">
-                                <div className="absolute top-6 left-6 text-[#86868B] text-[9px] font-bold uppercase tracking-[0.2em]">Live Canvas Preview</div>
-                                <div className="sticker-preview p-16 bg-checkered rounded-3xl max-w-full overflow-hidden shadow-2xl">
+                            <div className="flex-1 bg-[#F9F9FB] flex items-center justify-center relative p-12">
+                                <div className="absolute top-8 left-8 text-[#86868B] text-[9px] font-bold uppercase tracking-[0.2em]">Preview Area</div>
+                                <div className="sticker-preview p-20 bg-checkered rounded-[32px] max-w-full overflow-hidden shadow-sm border border-[#E5E5E7]">
                                     <p style={{ fontFamily: customFont || 'sans-serif', color: stickerColor, fontSize: '80px', lineHeight: 1, textAlign: 'center' }}>
                                         {stickerText}
                                     </p>
@@ -438,45 +434,45 @@ export default function EditorPage() {
                             </div>
 
                             {/* Controles */}
-                            <div className="w-full md:w-[340px] p-10 flex flex-col gap-8 bg-white">
+                            <div className="w-full md:w-[360px] p-10 flex flex-col gap-10 bg-white border-l border-[#E5E5E7]">
                                 <DialogHeader>
-                                    <DialogTitle className="text-2xl font-bold tracking-tight">Font Lab</DialogTitle>
-                                    <p className="text-xs text-[#86868B]">Crea stickers PNG con tipografía personalizada.</p>
+                                    <DialogTitle className="text-2xl font-bold tracking-tight text-[#1D1D1F]">Font Lab</DialogTitle>
+                                    <p className="text-[11px] text-[#86868B] font-medium leading-relaxed">Carga tus propias fuentes y crea stickers PNG con transparencia.</p>
                                 </DialogHeader>
 
-                                <div className="space-y-6">
+                                <div className="space-y-8">
                                     <div>
-                                        <label className="text-[10px] font-bold text-[#86868B] uppercase tracking-widest block mb-3">1. Tipografía Maestra</label>
+                                        <label className="text-[9px] font-bold text-[#86868B] uppercase tracking-[0.2em] block mb-4">1. Tipografía (.ttf / .otf)</label>
                                         <input ref={fontInputRef} type="file" accept=".ttf,.otf,.woff,.woff2" className="hidden" onChange={handleFontUpload} />
                                         <Button 
                                             variant="outline"
-                                            className={`w-full h-12 rounded-2xl border-[#E5E5E7] text-xs font-bold transition-all ${customFont ? 'bg-green-50 border-green-200 text-green-600' : 'bg-[#F5F5F7] hover:bg-white'}`}
+                                            className={`w-full h-12 rounded-2xl border-[#E5E5E7] text-xs font-bold transition-all shadow-sm ${customFont ? 'bg-[#E9E9FF] border-[#9291FF] text-[#6362D7]' : 'bg-white hover:bg-[#F5F5F7]'}`}
                                             onClick={() => fontInputRef.current?.click()}
                                         >
-                                            {customFont ? 'Fuente Cargada ✓' : 'Subir .TTF / .OTF'}
+                                            {customFont ? 'Fuente Cargada' : 'Seleccionar archivo'}
                                         </Button>
                                     </div>
 
                                     <div>
-                                        <label className="text-[10px] font-bold text-[#86868B] uppercase tracking-widest block mb-3">2. Composición</label>
+                                        <label className="text-[9px] font-bold text-[#86868B] uppercase tracking-[0.2em] block mb-4">2. Contenido del Sticker</label>
                                         <Input 
                                             value={stickerText}
                                             onChange={(e) => setStickerText(e.target.value)}
-                                            className="h-12 bg-[#F5F5F7] border-none rounded-2xl font-semibold px-5"
-                                            placeholder="Introduce texto..."
+                                            className="h-12 bg-[#F5F5F7] border-none rounded-2xl font-semibold px-5 focus-visible:ring-1 focus-visible:ring-[#9291FF]"
+                                            placeholder="Escribe algo..."
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="text-[10px] font-bold text-[#86868B] uppercase tracking-widest block mb-3">3. Variante</label>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <label className="text-[9px] font-bold text-[#86868B] uppercase tracking-[0.2em] block mb-4">3. Variante Cromática</label>
+                                        <div className="grid grid-cols-2 gap-3">
                                             {(['white', 'black'] as const).map(c => (
                                                 <button
                                                     key={c}
                                                     onClick={() => setStickerColor(c)}
-                                                    className={`h-12 rounded-2xl border-2 transition-all flex items-center justify-center gap-2 ${stickerColor === c ? 'border-[#1D1D1F] bg-[#F5F5F7]' : 'border-transparent bg-[#F5F5F7] hover:bg-white hover:border-[#E5E5E7]'}`}
+                                                    className={`h-12 rounded-2xl border transition-all flex items-center justify-center gap-3 ${stickerColor === c ? 'border-[#9291FF] bg-[#E9E9FF] text-[#6362D7]' : 'border-[#E5E5E7] bg-white hover:bg-[#F5F5F7]'}`}
                                                 >
-                                                    <div className={`w-4 h-4 rounded-full ${c === 'white' ? 'bg-white border border-[#E5E5E7]' : 'bg-black'}`} />
+                                                    <div className={`w-4 h-4 rounded-full ${c === 'white' ? 'bg-white border border-[#E5E5E7]' : 'bg-[#1D1D1F]'}`} />
                                                     <span className="text-[10px] font-bold uppercase">{c === 'white' ? 'Luz' : 'Sombra'}</span>
                                                 </button>
                                             ))}
@@ -485,28 +481,28 @@ export default function EditorPage() {
                                 </div>
 
                                 <Button 
-                                    className="mt-auto h-14 bg-[#1D1D1F] text-white rounded-[24px] font-bold text-sm shadow-xl hover:shadow-2xl transition-all"
+                                    className="mt-auto h-14 bg-[#9291FF] text-white rounded-[20px] font-bold text-sm shadow-lg hover:bg-[#7A79E6] transition-all"
                                     onClick={handleGenerateSticker}
                                 >
-                                    Generar Sticker PNG
+                                    Generar Sticker
                                 </Button>
                             </div>
                         </div>
                     </DialogContent>
                 </Dialog>
 
-                {/* Color Detail Modal (Dialog de Radix) */}
+                {/* Color Detail Modal */}
                 <Dialog open={!!selectedColor} onOpenChange={(open) => !open && setSelectedColor(null)}>
-                    <DialogContent className="max-w-sm p-10 rounded-[40px] border-none shadow-2xl bg-white">
-                        <DialogHeader className="mb-8">
-                            <DialogTitle className="text-xl font-bold tracking-tight">Análisis Cromático</DialogTitle>
+                    <DialogContent className="max-w-sm p-10 rounded-[32px] border-none shadow-2xl bg-white">
+                        <DialogHeader className="mb-8 text-center">
+                            <DialogTitle className="text-xl font-bold tracking-tight text-[#1D1D1F]">Análisis Cromático</DialogTitle>
                         </DialogHeader>
 
                         <div className="space-y-8">
-                            <div className="w-full h-40 rounded-[32px] shadow-inner border border-white" style={{ backgroundColor: selectedColor || '' }} />
+                            <div className="w-full h-40 rounded-[24px] shadow-sm border border-[#E5E5E7]" style={{ backgroundColor: selectedColor || '' }} />
 
                             <div>
-                                <label className="text-[10px] font-bold text-[#86868B] uppercase tracking-widest mb-4 block">Identificador HEX</label>
+                                <label className="text-[9px] font-bold text-[#86868B] uppercase tracking-[0.2em] mb-4 block text-center">Código HEX</label>
                                 <div className="flex gap-2">
                                     <Input
                                         value={selectedColor || ''}
@@ -515,7 +511,7 @@ export default function EditorPage() {
                                     />
                                     <Button
                                         onClick={() => handleCopyColor(selectedColor || '')}
-                                        className="h-14 w-14 rounded-2xl bg-[#1D1D1F] text-white hover:bg-black transition-all"
+                                        className="h-14 w-14 rounded-2xl bg-[#9291FF] text-white hover:bg-[#7A79E6] transition-all shadow-sm"
                                     >
                                         {copiedColor === selectedColor ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                                     </Button>
@@ -529,21 +525,3 @@ export default function EditorPage() {
         </TooltipProvider>
     );
 }
-
-// Re-defining ImageIcon because it was lost in the merge but it's needed
-const ImageIcon = ({ className, size }: { className?: string; size?: number }) => (
-    <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width={size || 24} 
-        height={size || 24} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className={className}
-    >
-        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-    </svg>
-);
