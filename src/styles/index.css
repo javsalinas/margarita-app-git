@@ -8,7 +8,82 @@
       linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
       linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
       linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    image-rendering: pixelated;
   }
+
+  /* 1. Dithering Background (Checkerboard pixel pattern) */
+  .bg-dither {
+    background-image: 
+      linear-gradient(45deg, var(--periwinkle) 25%, transparent 25%, transparent 75%, var(--periwinkle) 75%, var(--periwinkle)), 
+      linear-gradient(45deg, var(--periwinkle) 25%, transparent 25%, transparent 75%, var(--periwinkle) 75%, var(--periwinkle));
+    background-size: 4px 4px;
+    background-position: 0 0, 2px 2px;
+    background-color: var(--cream);
+    image-rendering: pixelated;
+  }
+
+  /* 2. Pixel Border Logic (Black outline, inner highlights) */
+  .pixel-box {
+    border: 2px solid var(--black);
+    background-color: var(--periwinkle);
+    box-shadow: 
+      inset -2px -2px 0px var(--periwinkle-selout),
+      inset 2px 2px 0px rgba(255, 255, 255, 0.7);
+    image-rendering: pixelated;
+  }
+
+  .pixel-box-cream {
+    border: 2px solid var(--black);
+    background-color: var(--cream);
+    box-shadow: 
+      inset -2px -2px 0px var(--cream-dark),
+      inset 2px 2px 0px rgba(255, 255, 255, 0.9);
+    image-rendering: pixelated;
+  }
+
+  /* 3. 2:1 Isometric Projection Matrix */
+  .iso-container {
+    perspective: 2000px;
+    transform-style: preserve-3d;
+  }
+
+  .iso-surface {
+    /* Magic angle for 2:1 pixels: rotateX(60deg) rotateZ(-45deg) */
+    transform: rotateX(60deg) rotateZ(-45deg);
+    transform-style: preserve-3d;
+    border: 4px solid var(--black);
+    /* Selout inner shadow for depth */
+    box-shadow: 
+      -4px 4px 0 var(--periwinkle-selout), 
+      -8px 8px 0 var(--black);
+    background-color: var(--cream);
+    image-rendering: pixelated;
+  }
+
+  /* Pixel Art Modal Bubble */
+  .pixel-bubble {
+    border: 4px solid var(--black);
+    border-radius: 0;
+    background: var(--white);
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  
+  .pixel-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 24px;
+    border-width: 16px 16px 0 0;
+    border-style: solid;
+    border-color: var(--black) transparent transparent transparent;
+  }
+}
+
+body {
+  font-family: var(--font-pixel);
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
 }

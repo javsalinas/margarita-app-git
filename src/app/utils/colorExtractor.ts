@@ -96,3 +96,22 @@ function rgbToHex(r: number, g: number, b: number): string {
     })
     .join('');
 }
+
+export function getColorName(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  if (r > 200 && g > 200 && b > 200) return 'Blanco';
+  if (r < 50 && g < 50 && b < 50) return 'Negro';
+  if (r > 150 && g < 100 && b < 100) return 'Rojo';
+  if (g > 150 && r < 100 && b < 100) return 'Verde';
+  if (b > 150 && r < 100 && g < 100) return 'Azul';
+  if (r > 150 && g > 150 && b < 100) return 'Amarillo';
+  if (r > 150 && b > 150 && g < 100) return 'Magenta';
+  if (g > 150 && b > 150 && r < 100) return 'Cian';
+  if (r > 200 && g > 150 && b < 100) return 'Naranja';
+  if (r > 100 && g > 100 && b > 100) return 'Gris';
+  
+  return 'Personalizado';
+}

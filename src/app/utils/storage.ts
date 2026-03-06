@@ -11,15 +11,51 @@ export interface Project {
   updatedAt: number;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
 const STORAGE_KEYS = {
   PROJECTS: 'margarita_projects',
+  USER: 'margarita_user',
 };
+
+/**
+ * Persistencia Unificada
+ */
+export async function saveProject(project: Project) {
+  // Intentar guardar en local primero
+  saveProjectLocal(project);
+  
+  // Si hay sesión en Supabase, guardar en la nube
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      await saveProjectCloud(project);
+    }
+  } catch (e) {
+    console.warn('Could not save to cloud, saved locally only.');
+  }
+}
+
+export function getProject(id: string): Project | null {
+  const projects = getProjectsLocal();
+  return projects.find(p => p.id === id) || null;
+}
+
+export function getUser(): User | null {
+  const data = localStorage.getItem(STORAGE_KEYS.USER);
+  return data ? JSON.parse(data) : null;
+}
 
 /**
  * Persistencia en Supabase (Nube)
  */
-export async function saveProjectCloud(project: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+async function saveProjectCloud(project: any) {
+  const user = await getCurrentUser();
   if (!user) return null;
 
   const { data, error } = await supabase
@@ -28,7 +64,7 @@ export async function saveProjectCloud(project: any) {
       id: project.id,
       user_id: user.id,
       name: project.name,
-      image_url: project.thumbnail, // En fase 3.1 subiremos a Storage
+      image_url: project.thumbnail,
       colors: project.colors,
       format: project.format,
       palette_position: project.palettePosition,
@@ -40,18 +76,8 @@ export async function saveProjectCloud(project: any) {
   return data;
 }
 
-export async function getProjectsCloud() {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .order('updated_at', { ascending: false });
-
-  if (error) throw error;
-  return data;
-}
-
 /**
- * Persistencia Local (Legacy / Guest Mode)
+ * Persistencia Local
  */
 export function getProjectsLocal(): Project[] {
   const data = localStorage.getItem(STORAGE_KEYS.PROJECTS);
