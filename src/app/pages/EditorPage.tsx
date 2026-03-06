@@ -13,7 +13,6 @@ type Format = '9:16' | '1:1' | '4:5';
 export default function EditorPage() {
   const navigate = useNavigate();
   const { projectId } = useParams();
-  const user = getUser();
 
   const [projectName, setProjectName] = useState('Nuevo Proyecto');
   const [format, setFormat] = useState<Format>('9:16');
@@ -30,6 +29,7 @@ export default function EditorPage() {
 
   // Cargar proyecto existente
   useEffect(() => {
+    const user = getUser();
     if (!user) {
       navigate('/');
       return;
@@ -48,7 +48,7 @@ export default function EditorPage() {
       // Posición inicial de la paleta (esquina superior derecha)
       setPalettePosition({ x: 80, y: 10 });
     }
-  }, [projectId, user, navigate]);
+  }, [projectId, navigate]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,26 +160,41 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <div className="min-h-screen bg-[#FAF3DD]">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
+      <header className="bg-[#B7E4C7] border-b-2 border-black">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate('/home')}
+              className="border-2 border-black bg-white hover:bg-[#FAF3DD]"
+              style={{ boxShadow: '2px 2px 0px #000000' }}
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <Input
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              className="max-w-xs"
+              className="max-w-xs border-2 border-black bg-white font-bold"
+              style={{ boxShadow: '2px 2px 0px #000000' }}
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={handleSave}>
+            <Button 
+              variant="outline" 
+              onClick={handleSave}
+              className="border-2 border-black bg-white hover:bg-[#FAF3DD] font-bold"
+              style={{ boxShadow: '2px 2px 0px #000000' }}
+            >
               Guardar
             </Button>
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600">
+            <Button 
+              className="bg-[#F4C152] hover:bg-[#F4C152]/90 text-black border-2 border-black font-black"
+              style={{ boxShadow: '2px 2px 0px #000000' }}
+            >
               <Download className="w-4 h-4 mr-2" />
               Exportar
             </Button>
@@ -193,8 +208,8 @@ export default function EditorPage() {
           {/* Canvas Area */}
           <div className="space-y-4">
             {/* Format Selector */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-3">
-              <span className="text-sm font-medium">Formato:</span>
+            <div className="bg-white border-2 border-black rounded-[4px] p-4 flex items-center gap-3" style={{ boxShadow: '4px 4px 0px #000000' }}>
+              <span className="text-sm font-black text-black">Formato:</span>
               <div className="flex gap-2">
                 {(['9:16', '1:1', '4:5'] as Format[]).map((f) => (
                   <Button
@@ -202,7 +217,11 @@ export default function EditorPage() {
                     variant={format === f ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setFormat(f)}
-                    className={format === f ? 'bg-gradient-to-r from-purple-600 to-pink-600' : ''}
+                    className={format === f 
+                      ? 'bg-[#F4C152] text-black border-2 border-black font-black' 
+                      : 'border-2 border-black bg-white hover:bg-[#FAF3DD] font-bold'
+                    }
+                    style={{ boxShadow: '2px 2px 0px #000000' }}
                   >
                     {f === '9:16' ? 'Story' : f === '1:1' ? 'Cuadrado' : 'Feed'}
                   </Button>
@@ -211,11 +230,12 @@ export default function EditorPage() {
             </div>
 
             {/* Canvas */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl">
+            <div className="bg-white border-2 border-black rounded-[4px] p-8" style={{ boxShadow: '6px 6px 0px #000000' }}>
               <div className="flex justify-center">
                 <div
                   ref={canvasRef}
-                  className={`relative ${getCanvasAspectRatio()} w-full max-w-md bg-gray-100 rounded-2xl overflow-hidden`}
+                  className={`relative ${getCanvasAspectRatio()} w-full max-w-md bg-[#FAF3DD] border-2 border-black rounded-[4px] overflow-hidden`}
+                  style={{ boxShadow: '4px 4px 0px #000000' }}
                   onMouseMove={handlePaletteDrag}
                   onTouchMove={handlePaletteDrag}
                   onMouseUp={handleLongPressEnd}
@@ -229,9 +249,9 @@ export default function EditorPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-black">
                       <Upload className="w-16 h-16 mb-4" />
-                      <p className="text-sm">Carga una imagen para empezar</p>
+                      <p className="text-sm font-bold">Carga una imagen para empezar</p>
                     </div>
                   )}
 
@@ -252,8 +272,8 @@ export default function EditorPage() {
                       {colors.map((color, idx) => (
                         <motion.div
                           key={idx}
-                          className="w-12 h-12 rounded-full border-3 border-white shadow-lg"
-                          style={{ backgroundColor: color }}
+                          className="w-12 h-12 rounded-full border-2 border-black"
+                          style={{ backgroundColor: color, boxShadow: '2px 2px 0px #000000' }}
                           whileHover={{ scale: 1.15 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleColorClick(color)}
@@ -261,7 +281,7 @@ export default function EditorPage() {
                       ))}
                       
                       {isDragging && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded-[2px] whitespace-nowrap font-bold">
                           Arrastrando...
                         </div>
                       )}
@@ -275,8 +295,8 @@ export default function EditorPage() {
           {/* Right Sidebar */}
           <div className="space-y-4">
             {/* Upload Image */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
-              <h3 className="font-semibold mb-4">Cargar Imagen</h3>
+            <div className="bg-white border-2 border-black rounded-[4px] p-6" style={{ boxShadow: '4px 4px 0px #000000' }}>
+              <h3 className="font-black mb-4 text-black">Cargar Imagen</h3>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -286,33 +306,35 @@ export default function EditorPage() {
               />
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full border-2 border-black bg-white hover:bg-[#FAF3DD] font-bold"
+                style={{ boxShadow: '2px 2px 0px #000000' }}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Seleccionar Imagen
               </Button>
-              <p className="text-xs text-gray-500 mt-3">
+              <p className="text-xs text-black/70 mt-3 font-medium">
                 Sube una imagen de alta resolución para extraer su paleta de colores
               </p>
             </div>
 
             {/* Color List */}
             {colors.length > 0 && (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
-                <h3 className="font-semibold mb-4">Paleta Extraída</h3>
+              <div className="bg-white border-2 border-black rounded-[4px] p-6" style={{ boxShadow: '4px 4px 0px #000000' }}>
+                <h3 className="font-black mb-4 text-black">Paleta Extraída</h3>
                 <div className="space-y-2">
                   {colors.map((color, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center gap-3 p-2 rounded-[2px] hover:bg-[#FAF3DD] cursor-pointer border border-black"
+                      style={{ boxShadow: '1px 1px 0px #000000' }}
                       onClick={() => handleColorClick(color)}
                     >
                       <div
-                        className="w-10 h-10 rounded-full border-2 border-gray-200"
-                        style={{ backgroundColor: color }}
+                        className="w-10 h-10 rounded-full border-2 border-black"
+                        style={{ backgroundColor: color, boxShadow: '2px 2px 0px #000000' }}
                       />
-                      <span className="text-sm font-mono flex-1">{color}</span>
+                      <span className="text-sm font-mono flex-1 font-bold text-black">{color}</span>
                     </div>
                   ))}
                 </div>
@@ -320,9 +342,9 @@ export default function EditorPage() {
             )}
 
             {/* Hint */}
-            <div className="bg-purple-50 rounded-2xl p-6">
-              <p className="text-sm text-purple-900">
-                <strong>💡 Consejo:</strong> Mantén presionado sobre la paleta de colores para arrastrarla y reposicionarla en tu diseño.
+            <div className="bg-[#F4C152] border-2 border-black rounded-[4px] p-6" style={{ boxShadow: '4px 4px 0px #000000' }}>
+              <p className="text-sm text-black font-bold">
+                <strong className="font-black">💡 Consejo:</strong> Mantén presionado sobre la paleta de colores para arrastrarla y reposicionarla en tu diseño.
               </p>
             </div>
           </div>
@@ -332,21 +354,24 @@ export default function EditorPage() {
       {/* Color Detail Modal */}
       {selectedColor && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6"
           onClick={() => setSelectedColor(null)}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl"
+            className="bg-white border-2 border-black rounded-[4px] p-8 max-w-sm w-full"
+            style={{ boxShadow: '8px 8px 0px #000000' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold">Detalle de Color</h3>
+              <h3 className="text-2xl font-black text-black">Detalle de Color</h3>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSelectedColor(null)}
+                className="border-2 border-black bg-white hover:bg-[#FAF3DD]"
+                style={{ boxShadow: '2px 2px 0px #000000' }}
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -355,24 +380,26 @@ export default function EditorPage() {
             <div className="space-y-6">
               {/* Color Preview */}
               <div
-                className="w-full h-32 rounded-2xl border-2 border-gray-200"
-                style={{ backgroundColor: selectedColor }}
+                className="w-full h-32 rounded-[4px] border-2 border-black"
+                style={{ backgroundColor: selectedColor, boxShadow: '4px 4px 0px #000000' }}
               />
 
               {/* HEX Code */}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-sm font-black text-black mb-2 block">
                   Código HEX
                 </label>
                 <div className="flex gap-2">
                   <Input
                     value={selectedColor}
                     readOnly
-                    className="font-mono"
+                    className="font-mono border-2 border-black bg-white font-bold"
+                    style={{ boxShadow: '2px 2px 0px #000000' }}
                   />
                   <Button
                     onClick={() => handleCopyColor(selectedColor)}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600"
+                    className="bg-[#F4C152] hover:bg-[#F4C152]/90 text-black border-2 border-black font-black"
+                    style={{ boxShadow: '2px 2px 0px #000000' }}
                   >
                     {copiedColor === selectedColor ? (
                       <Check className="w-4 h-4" />
@@ -383,7 +410,7 @@ export default function EditorPage() {
                 </div>
               </div>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-black/70 font-medium">
                 Copia este código para usarlo en tus otros proyectos de diseño
               </p>
             </div>

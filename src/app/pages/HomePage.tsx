@@ -7,11 +7,12 @@ import { getProjects, getUser, clearUser, type Project } from '../utils/storage'
 export default function HomePage() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
-  const user = getUser();
+  const [user, setUser] = useState(getUser());
 
   useEffect(() => {
     // Verificar autenticación
-    if (!user) {
+    const currentUser = getUser();
+    if (!currentUser) {
       navigate('/');
       return;
     }
@@ -19,7 +20,7 @@ export default function HomePage() {
     // Cargar proyectos
     const loadedProjects = getProjects();
     setProjects(loadedProjects);
-  }, [user, navigate]);
+  }, [navigate]);
 
   const handleLogout = () => {
     clearUser();
@@ -49,21 +50,26 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <div className="min-h-screen bg-[#FAF3DD]">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
+      <header className="bg-[#B7E4C7] border-b-2 border-black">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-[4px] bg-[#F4C152] border-2 border-black flex items-center justify-center" style={{ boxShadow: '2px 2px 0px #000000' }}>
               <span className="text-xl">🌸</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold">Margarita App</h1>
-              <p className="text-sm text-gray-600">Hola, {user?.name}</p>
+              <h1 className="text-xl font-black text-black">Margarita App</h1>
+              <p className="text-sm text-black font-medium">Hola, {user?.name}</p>
             </div>
           </div>
 
-          <Button variant="ghost" onClick={handleLogout}>
+          <Button 
+            variant="ghost" 
+            onClick={handleLogout}
+            className="border-2 border-black bg-white hover:bg-[#FAF3DD] font-bold"
+            style={{ boxShadow: '2px 2px 0px #000000' }}
+          >
             <LogOut className="w-4 h-4 mr-2" />
             Salir
           </Button>
@@ -74,8 +80,8 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Mis Proyectos</h2>
-            <p className="text-gray-600">
+            <h2 className="text-4xl font-black mb-2 text-black">Mis Proyectos</h2>
+            <p className="text-black font-bold">
               {projects.length} {projects.length === 1 ? 'diseño' : 'diseños'} guardados
             </p>
           </div>
@@ -84,16 +90,17 @@ export default function HomePage() {
         {/* Projects Grid */}
         {projects.length === 0 ? (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-purple-100 mb-6">
-              <Palette className="w-10 h-10 text-purple-600" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-[4px] bg-[#F4C152] border-2 border-black mb-6" style={{ boxShadow: '4px 4px 0px #000000' }}>
+              <Palette className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No tienes proyectos aún</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-2xl font-black mb-2 text-black">No tienes proyectos aún</h3>
+            <p className="text-black font-bold mb-6">
               Crea tu primer diseño editorial con paleta inteligente
             </p>
             <Button
               size="lg"
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="bg-[#F4C152] hover:bg-[#F4C152]/90 text-black border-2 border-black font-black"
+              style={{ boxShadow: '4px 4px 0px #000000' }}
               onClick={handleCreateProject}
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -105,11 +112,12 @@ export default function HomePage() {
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer"
+                className="group bg-white rounded-[4px] border-2 border-black overflow-hidden cursor-pointer transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]"
+                style={{ boxShadow: '4px 4px 0px #000000' }}
                 onClick={() => handleOpenProject(project.id)}
               >
                 {/* Thumbnail */}
-                <div className="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                <div className="aspect-[3/4] bg-[#FAF3DD] relative overflow-hidden border-b-2 border-black">
                   {project.thumbnail ? (
                     <img
                       src={project.thumbnail}
@@ -118,7 +126,7 @@ export default function HomePage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Palette className="w-12 h-12 text-gray-400" />
+                      <Palette className="w-12 h-12 text-black" />
                     </div>
                   )}
                   
@@ -127,22 +135,22 @@ export default function HomePage() {
                     {project.colors.slice(0, 3).map((color, idx) => (
                       <div
                         key={idx}
-                        className="w-8 h-8 rounded-full border-2 border-white shadow-lg"
-                        style={{ backgroundColor: color }}
+                        className="w-8 h-8 rounded-full border-2 border-black"
+                        style={{ backgroundColor: color, boxShadow: '2px 2px 0px #000000' }}
                       />
                     ))}
                   </div>
                 </div>
 
                 {/* Info */}
-                <div className="p-4">
-                  <h3 className="font-semibold mb-1 truncate">{project.name}</h3>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="p-4 bg-white">
+                  <h3 className="font-black mb-1 truncate text-black">{project.name}</h3>
+                  <div className="flex items-center justify-between text-sm text-black font-bold">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {formatDate(project.updatedAt)}
                     </span>
-                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    <span className="text-xs bg-[#F4C152] border border-black px-2 py-1 rounded-[2px]">
                       {project.format === '9:16' ? 'Story' : project.format === '1:1' ? 'Cuadrado' : 'Feed'}
                     </span>
                   </div>
@@ -155,7 +163,8 @@ export default function HomePage() {
 
       {/* Floating Action Button */}
       <button
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-2xl flex items-center justify-center text-white transition-transform hover:scale-110"
+        className="fixed bottom-8 right-8 w-16 h-16 rounded-[4px] bg-[#F4C152] hover:bg-[#F4C152]/90 border-2 border-black flex items-center justify-center text-black transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]"
+        style={{ boxShadow: '6px 6px 0px #000000' }}
         onClick={handleCreateProject}
       >
         <Plus className="w-8 h-8" />

@@ -2,43 +2,50 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
+  
+  /* Neo-Brutalist Color Palette */
+  --background: #FAF3DD; /* Crema Suave */
+  --foreground: #000000; /* Negro puro */
+  --card: #FAF3DD;
+  --card-foreground: #000000;
+  --popover: #FAF3DD;
+  --popover-foreground: #000000;
+  --primary: #F4C152; /* Amarillo Sólido */
+  --primary-foreground: #000000;
+  --secondary: #B7E4C7; /* Verde Menta Pastel */
+  --secondary-foreground: #000000;
+  --muted: #FAF3DD;
+  --muted-foreground: #000000;
+  --accent: #F4C152;
+  --accent-foreground: #000000;
+  --destructive: #FF6B6B;
+  --destructive-foreground: #000000;
+  --border: #000000; /* Bordes negros sólidos */
+  --input: #000000;
+  --input-background: #FFFFFF;
+  --switch-background: #000000;
+  --font-weight-medium: 700;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
+  --ring: #000000;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 4px; /* Corner radius mínimo */
+  --sidebar: #B7E4C7; /* Verde Menta */
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #000000;
+  --sidebar-primary-foreground: #FAF3DD;
+  --sidebar-accent: #F4C152;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #000000;
+  --sidebar-ring: #000000;
+  
+  /* Hard Shadow */
+  --shadow-brutal: 4px 4px 0px #000000;
+  --shadow-brutal-sm: 2px 2px 0px #000000;
+  --shadow-brutal-lg: 6px 6px 0px #000000;
 }
 
 .dark {

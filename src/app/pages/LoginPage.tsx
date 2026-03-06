@@ -26,24 +26,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#FAF3DD] flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Logo y título */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-[4px] bg-[#F4C152] border-2 border-black mb-6" style={{ boxShadow: '4px 4px 0px #000000' }}>
             <span className="text-3xl">🌸</span>
           </div>
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-black mb-3 text-black">
             Margarita App
           </h1>
-          <p className="text-gray-600">
+          <p className="text-black font-medium">
             Diseño editorial con identidad visual coherente
           </p>
         </div>
 
         {/* Card de login */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl">
-          <h2 className="text-xl font-semibold mb-6 text-center">
+        <div className="bg-white border-2 border-black rounded-[4px] p-8" style={{ boxShadow: '6px 6px 0px #000000' }}>
+          <h2 className="text-2xl font-black mb-6 text-center text-black">
             Accede a tu cuenta
           </h2>
 
@@ -51,7 +51,8 @@ export default function LoginPage() {
             {/* Google */}
             <Button
               variant="outline"
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base border-2 border-black bg-white hover:bg-[#FAF3DD] font-bold"
+              style={{ boxShadow: '2px 2px 0px #000000' }}
               onClick={() => handleSocialLogin('google')}
               disabled={isLoading}
             >
@@ -79,7 +80,8 @@ export default function LoginPage() {
             {/* Apple */}
             <Button
               variant="outline"
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base border-2 border-black bg-white hover:bg-[#FAF3DD] font-bold"
+              style={{ boxShadow: '2px 2px 0px #000000' }}
               onClick={() => handleSocialLogin('apple')}
               disabled={isLoading}
             >
@@ -91,7 +93,8 @@ export default function LoginPage() {
 
             {/* Email (Demo) */}
             <Button
-              className="w-full h-12 text-base bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="w-full h-12 text-base bg-[#F4C152] hover:bg-[#F4C152]/90 text-black border-2 border-black font-black"
+              style={{ boxShadow: '4px 4px 0px #000000' }}
               onClick={() => handleSocialLogin('demo')}
               disabled={isLoading}
             >
@@ -100,13 +103,13 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <p className="text-xs text-gray-500 text-center mt-6">
+          <p className="text-xs text-black/70 text-center mt-6 font-medium">
             Al continuar, aceptas sincronizar tu nube de diseños y fuentes personales (.TTF / .OTF)
           </p>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center font-bold text-black mt-6">
           ¿Primera vez? Tu cuenta se creará automáticamente
         </p>
       </div>
