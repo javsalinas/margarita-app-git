@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { Sparkles, Github, Mail } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Mail, User } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 import { toast } from 'sonner';
 
@@ -11,7 +9,7 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSocialLogin = async (provider: 'google' | 'github') => {
+    const handleSocialLogin = async (provider: 'google') => {
         setIsLoading(true);
         try {
             const { error } = await supabase.auth.signInWithOAuth({
@@ -28,64 +26,65 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-6 relative overflow-hidden">
-            {/* Elementos Decorativos Airy */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-50 rounded-full blur-[120px] opacity-50" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-50 rounded-full blur-[120px] opacity-50" />
-
+        <div className="min-h-screen bg-[var(--cream)] flex items-center justify-center p-6 relative overflow-hidden font-['Silkscreen']">
+            
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
                 className="w-full max-w-[440px] z-10"
             >
-                <div className="flex flex-col items-center mb-12">
-                    <div className="w-16 h-16 bg-white rounded-[24px] shadow-xl flex items-center justify-center mb-6 border border-[#E5E5E7]">
-                        <Sparkles className="w-8 h-8 text-[#1D1D1F]" />
+                <div className="flex flex-col items-center mb-10 text-center">
+                    {/* Isometric Logo Container with Daisy */}
+                    <div className="w-24 h-24 bg-white border-[4px] border-black flex items-center justify-center mb-6 shadow-[8px_8px_0_rgba(0,0,0,1)] pixel-box-cream">
+                        <img src="/src/assets/daisy.png" alt="Margarita Logo" className="w-16 h-16 object-contain" />
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-[#1D1D1F] mb-2 font-['Syne']">Margarita</h1>
-                    <p className="text-[#86868B] font-medium uppercase text-[10px] tracking-[0.2em]">Herramienta Editorial Pro</p>
+                    <h1 className="text-5xl font-black tracking-tighter text-black mb-2 uppercase drop-shadow-[4px_4px_0_var(--periwinkle)]">Margarita</h1>
+                    <p className="text-black/60 font-bold uppercase text-[10px] tracking-[0.25em]">Design Tool Studio</p>
                 </div>
 
-                <Card className="border-none shadow-[0_40px_100px_rgba(0,0,0,0.06)] rounded-[40px] bg-white/80 backdrop-blur-xl p-4">
-                    <CardHeader className="pt-8 pb-4 text-center">
-                        <CardTitle className="text-xl font-bold">Bienvenido de nuevo</CardTitle>
-                        <CardDescription className="text-xs">Sincroniza tus diseños y fuentes en la nube.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4 pb-8">
-                        <Button 
-                            variant="outline" 
-                            className="w-full h-14 rounded-2xl border-[#E5E5E7] hover:bg-[#F5F5F7] transition-all flex items-center gap-3 font-bold text-sm"
-                            onClick={() => handleSocialLogin('github')}
-                            disabled={isLoading}
-                        >
-                            <Github className="w-5 h-5" />
-                            Continuar con GitHub
-                        </Button>
-                        <Button 
-                            className="w-full h-14 rounded-2xl bg-[#1D1D1F] text-white hover:bg-black transition-all flex items-center gap-3 font-bold text-sm shadow-xl"
-                            onClick={() => handleSocialLogin('google' as any)} // Google handled as example
-                            disabled={isLoading}
-                        >
-                            <Mail className="w-5 h-5" />
-                            Continuar con Google
-                        </Button>
-                        
-                        <div className="pt-4 text-center">
-                            <p className="text-[10px] text-[#86868B] leading-relaxed px-8">
-                                Al continuar, aceptas los términos de servicio y la política de privacidad de Margarita App.
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className="pixel-box bg-white p-8 shadow-[12px_12px_0_rgba(0,0,0,1)] relative border-[4px] border-black">
+                    <div className="text-center mb-8 border-b-4 border-black pb-6">
+                        <h2 className="text-xl font-bold uppercase mb-2">Acceso al Sistema</h2>
+                        <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest leading-relaxed">Sincroniza tus fuentes y proyectos en la nube</p>
+                    </div>
 
-                <div className="mt-12 text-center">
-                    <button 
-                        onClick={() => navigate('/editor/new')}
-                        className="text-xs font-bold text-[#86868B] hover:text-[#1D1D1F] transition-colors uppercase tracking-widest"
-                    >
-                        O entrar como invitado
-                    </button>
+                    <div className="space-y-6">
+                        <button 
+                            className="w-full h-16 bg-white border-[4px] border-black text-black hover:bg-[var(--periwinkle)] transition-all flex items-center justify-center gap-4 font-bold text-sm uppercase shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+                            onClick={() => handleSocialLogin('google')}
+                            disabled={isLoading}
+                        >
+                            <Mail className="w-6 h-6" strokeWidth={3} />
+                            Entrar con Google
+                        </button>
+
+                        <div className="relative flex items-center justify-center py-2">
+                            <div className="absolute w-full h-[2px] bg-black opacity-10"></div>
+                            <span className="relative bg-white px-4 text-[9px] font-bold text-black/30 uppercase tracking-[0.3em]">O TAMBIÉN</span>
+                        </div>
+
+                        <button 
+                            className="w-full h-16 bg-[var(--cream)] border-[4px] border-black text-black hover:bg-[var(--cream-dark)] transition-all flex items-center justify-center gap-4 font-bold text-sm uppercase shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+                            onClick={() => navigate('/editor/new')}
+                            disabled={isLoading}
+                        >
+                            <User className="w-6 h-6" strokeWidth={3} />
+                            Modo Invitado
+                        </button>
+                    </div>
+
+                    <div className="mt-8 text-center px-4">
+                        <p className="text-[8px] text-black/40 font-bold leading-relaxed uppercase tracking-widest">
+                            Al entrar, aceptas los términos de servicio de Margarita App.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="mt-10 flex justify-center gap-4">
+                    <div className="w-3 h-3 bg-black"></div>
+                    <div className="w-3 h-3 bg-[var(--periwinkle)]"></div>
+                    <div className="w-3 h-3 bg-[var(--cream-dark)]"></div>
                 </div>
             </motion.div>
         </div>

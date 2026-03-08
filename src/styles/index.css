@@ -13,13 +13,8 @@
     image-rendering: pixelated;
   }
 
-  /* 1. Dithering Background (Checkerboard pixel pattern) */
-  .bg-dither {
-    background-image: 
-      linear-gradient(45deg, var(--periwinkle) 25%, transparent 25%, transparent 75%, var(--periwinkle) 75%, var(--periwinkle)), 
-      linear-gradient(45deg, var(--periwinkle) 25%, transparent 25%, transparent 75%, var(--periwinkle) 75%, var(--periwinkle));
-    background-size: 4px 4px;
-    background-position: 0 0, 2px 2px;
+  /* 1. Base Background Utility (Solid) */
+  .bg-pixel-base {
     background-color: var(--cream);
     image-rendering: pixelated;
   }

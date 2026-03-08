@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Upload, Copy, Check, Download, Type, Layers, Plus, Image as ImageIcon, Trash2, ClipboardPaste, Palette, Monitor } from 'lucide-react';
+import { ArrowLeft, Upload, Copy, Check, Download, Type, Layers, Plus, Image as ImageIcon, Trash2, ClipboardPaste, Palette } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { extractColorsFromImage } from '../utils/colorExtractor';
-import { saveProject, getProject, getUser } from '../utils/storage';
+import { extractColorsFromImage, getColorName } from '../utils/colorExtractor';
+import { saveProject, getProject } from '../utils/storage';
 import { generateTextSticker } from '../utils/fontLoader';
 import { saveFontToDB, getAllFontsFromDB, deleteFontFromDB, registerFont } from '../utils/fontDatabase';
 import { toast } from 'sonner';
@@ -11,6 +11,9 @@ import { toast } from 'sonner';
 // UI Components
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Card, CardContent } from '../components/ui/card';
 
 type Format = '9:16' | '1:1' | '4:5';
 type Tab = 'color-studio' | 'font-studio';
@@ -33,7 +36,7 @@ export default function EditorPage() {
     const [format, setFormat] = useState<Format>('9:16');
     const [image, setImage] = useState<string | null>(null);
     const [colors, setColors] = useState<string[]>([]);
-    const [palettePosition, setPalettePosition] = useState({ x: 80, y: 10 });
+    const [palettePosition, setPalettePosition] = useState({ x: 80, y: 15 });
     const [overlays, setOverlays] = useState<Overlay[]>([]);
     
     // Interaction State
@@ -79,6 +82,40 @@ export default function EditorPage() {
         }
     }, [projectId]);
 
+    useEffect(() => {
+        const handlePaste = async (e: ClipboardEvent) => {
+            if (activeTab !== 'color-studio') return;
+            
+            const items = e.clipboardData?.items;
+            if (!items) return;
+
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();
+                    if (!blob) continue;
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const dataUrl = event.target?.result as string;
+                        const newOverlay: Overlay = {
+                            id: crypto.randomUUID(),
+                            type: 'sticker',
+                            dataUrl,
+                            position: { x: 50, y: 50 },
+                            scale: 1,
+                        };
+                        setOverlays(prev => [...prev, newOverlay]);
+                        toast.success('Sticker pegado');
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        };
+
+        window.addEventListener('paste', handlePaste);
+        return () => window.removeEventListener('paste', handlePaste);
+    }, [activeTab]);
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -90,9 +127,10 @@ export default function EditorPage() {
         try {
             const extractedColors = await extractColorsFromImage(file, 6);
             setColors(extractedColors.map(c => c.hex));
-            toast.success('Colores extraídos');
+            setPalettePosition({ x: 80, y: 15 });
+            toast.success('ADN Visual extraído');
         } catch (error) {
-            toast.error('Error al extraer colores');
+            toast.error('Error al analizar imagen');
         }
     };
 
@@ -108,23 +146,23 @@ export default function EditorPage() {
                 await registerFont(newFont);
                 setStoredFonts(fonts);
                 setSelectedFontId(id);
-                toast.success('Fuente guardada');
+                toast.success('Tipografía registrada');
             }
         } catch (error) {
-            toast.error('Error al guardar fuente');
+            toast.error('Error al cargar fuente');
         }
     };
 
     const handleCopySticker = async () => {
         if (!selectedFontId) return toast.error('Selecciona una fuente');
-        const dataUrl = generateTextSticker(stickerText, selectedFontId, stickerColor);
+        const dataUrl = generateTextSticker(stickerText, selectedFontId, stickerColor, 400);
         try {
             const response = await fetch(dataUrl);
             const blob = await response.blob();
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-            toast.success('Sticker copiado');
+            toast.success('Copiado. Pégalo en el Studio (Ctrl+V)');
         } catch (error) {
-            toast.error('Error al copiar');
+            toast.error('Error al procesar sticker');
         }
     };
 
@@ -141,8 +179,11 @@ export default function EditorPage() {
         const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
         const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-        const pctX = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-        const pctY = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+        const pxX = clientX - rect.left;
+        const pxY = clientY - rect.top;
+
+        const pctX = Math.max(0, Math.min(100, (pxX / rect.width) * 100));
+        const pctY = Math.max(0, Math.min(100, (pxY / rect.height) * 100));
 
         if (isDraggingPalette) {
             setPalettePosition({ x: pctX, y: pctY });
@@ -159,7 +200,7 @@ export default function EditorPage() {
     };
 
     const handleSave = () => {
-        if (!image || colors.length === 0) return toast.error('Necesitas imagen y colores');
+        if (!image || colors.length === 0) return toast.error('Lienzo vacío');
         const project = {
             id: projectId && projectId !== 'new' ? projectId : crypto.randomUUID(),
             name: projectName,
@@ -171,223 +212,272 @@ export default function EditorPage() {
             updatedAt: Date.now(),
         };
         saveProject(project);
-        toast.success('Guardado correctamente');
+        toast.success('Proyecto guardado');
+    };
+
+    const handleExport = async () => {
+        if (!image || !canvasRef.current) return toast.error('Nada que exportar');
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = image;
+
+        await new Promise((resolve) => { img.onload = resolve; });
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0);
+
+        if (colors.length > 0) {
+            const circleRadius = canvas.width * 0.06;
+            const gap = circleRadius * 0.4;
+            const startX = (palettePosition.x / 100) * canvas.width;
+            const startY = (palettePosition.y / 100) * canvas.height;
+
+            colors.forEach((color, idx) => {
+                ctx.beginPath();
+                ctx.arc(startX, startY + (idx * (circleRadius * 2 + gap)), circleRadius, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        for (const o of overlays) {
+            const sImg = new Image();
+            sImg.src = o.dataUrl;
+            await new Promise((resolve) => { sImg.onload = resolve; });
+            const sw = sImg.width * o.scale * (canvas.width / 440);
+            const sh = sImg.height * o.scale * (canvas.width / 440);
+            ctx.drawImage(sImg, (o.position.x / 100) * canvas.width - sw/2, (o.position.y / 100) * canvas.height - sh/2, sw, sh);
+        }
+
+        const link = document.createElement('a');
+        link.download = `${projectName}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+        toast.success('Alta Resolución exportada');
     };
 
     return (
         <TooltipProvider>
-            <div className="min-h-screen bg-[#F5F5F7] text-black select-none overflow-hidden flex flex-col" 
+            <div className="min-h-screen bg-[#FDFCFB] text-[#1D1D1F] select-none font-['Plus_Jakarta_Sans'] overflow-hidden flex flex-col" 
                  onMouseMove={handleGlobalDrag} 
                  onTouchMove={handleGlobalDrag}
                  onMouseUp={handleDragEnd}
                  onTouchEnd={handleDragEnd}>
                 
-                {/* Clean Top Navbar */}
-                <header className="h-16 border-b-2 border-black bg-white flex items-center px-6 z-40">
+                {/* Navbar Vaporwave Airy */}
+                <header className="h-16 border-b border-[#E5E5E7] bg-white/70 backdrop-blur-xl sticky top-0 z-40 flex items-center px-6">
                     <div className="flex items-center gap-4 flex-1">
-                        <button className="w-10 h-10 flex items-center justify-center border-2 border-black rounded-lg hover:bg-black hover:text-white transition-colors" onClick={() => navigate('/home')}>
+                        <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100" onClick={() => navigate('/home')}>
                             <ArrowLeft size={20} />
-                        </button>
-                        
-                        <div className="h-8 w-[2px] bg-black opacity-10 mx-2" />
-
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-['Silkscreen'] uppercase tracking-widest text-slate-400">Project</span>
-                            <input
-                                value={projectName}
-                                onChange={(e) => setProjectName(e.target.value)}
-                                className="bg-transparent border-none font-['Archivo'] font-bold text-lg focus:outline-none p-0 h-6 w-48"
-                            />
-                        </div>
+                        </Button>
+                        <div className="h-4 w-[1px] bg-[#E5E5E7] mx-1" />
+                        <Input
+                            value={projectName}
+                            onChange={(e) => setProjectName(e.target.value)}
+                            className="bg-transparent border-none focus-visible:ring-0 text-sm font-semibold h-8 w-48 p-0"
+                        />
                     </div>
 
-                    {/* Tab Switcher (Minimal) */}
-                    <div className="flex bg-slate-100 p-1 rounded-xl border-2 border-black gap-1">
-                        <button 
-                            onClick={() => setActiveTab('color-studio')}
-                            className={`px-6 h-9 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'color-studio' ? 'bg-black text-white' : 'text-slate-500 hover:text-black'}`}>
-                            Studio
-                        </button>
-                        <button 
-                            onClick={() => setActiveTab('font-studio')}
-                            className={`px-6 h-9 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'font-studio' ? 'bg-black text-white' : 'text-slate-500 hover:text-black'}`}>
-                            Font Lab
-                        </button>
+                    <div className="hidden md:flex gap-2 mx-4 bg-slate-100 p-1 rounded-2xl border border-[#E5E5E7]">
+                        <button onClick={() => setActiveTab('color-studio')} className={`h-9 px-6 rounded-xl text-[10px] uppercase font-bold tracking-widest transition-all ${activeTab === 'color-studio' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}`}>Studio</button>
+                        <button onClick={() => setActiveTab('font-studio')} className={`h-9 px-6 rounded-xl text-[10px] uppercase font-bold tracking-widest transition-all ${activeTab === 'font-studio' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}`}>Fonts</button>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-1 justify-end">
-                        <button className="px-6 h-10 rounded-xl border-2 border-black font-['Archivo'] font-bold text-xs uppercase hover:bg-slate-50 transition-all" onClick={handleSave}>Save</button>
-                        <button className="px-6 h-10 rounded-xl bg-black text-white font-['Archivo'] font-bold text-xs uppercase flex items-center gap-2 hover:opacity-90 transition-all">
-                            Export <Download size={14} />
-                        </button>
+                    <div className="flex items-center gap-2 flex-1 justify-end">
+                        <Button variant="outline" size="sm" className="rounded-full text-xs font-bold border-[#E5E5E7]" onClick={handleSave}>Guardar</Button>
+                        <Button size="sm" className="rounded-full bg-primary text-white text-xs font-bold px-6 hover:opacity-90 shadow-lg shadow-primary/20" onClick={handleExport}>
+                            Exportar <Download className="w-3 h-3 ml-2" />
+                        </Button>
                     </div>
                 </header>
 
                 <main className="flex-1 relative flex overflow-hidden">
-                    
-                    {/* LEFT TOOLS */}
-                    <aside className="w-20 border-r-2 border-black bg-white flex flex-col items-center py-8 gap-8 z-30">
+                    {/* Left Sidebar */}
+                    <aside className="hidden md:flex w-16 border-r border-[#E5E5E7] flex flex-col items-center py-6 gap-6 bg-white">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <button className="w-12 h-12 flex items-center justify-center border-2 border-black rounded-2xl hover:bg-slate-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none transition-all" onClick={() => fileInputRef.current?.click()}>
+                                <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-primary hover:bg-slate-50" onClick={() => fileInputRef.current?.click()}>
                                     <ImageIcon size={20} />
-                                </button>
+                                </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="font-['Archivo'] font-bold">Base Image</TooltipContent>
+                            <TooltipContent side="right">Imagen</TooltipContent>
                         </Tooltip>
-                        
+                        <div className="h-[1px] w-8 bg-[#E5E5E7]" />
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <button className="w-12 h-12 flex items-center justify-center border-2 border-black rounded-2xl hover:bg-slate-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none transition-all">
+                                <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-primary hover:bg-slate-50">
                                     <Layers size={20} />
-                                </button>
+                                </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="font-['Archivo'] font-bold">Layers</TooltipContent>
-                        </Tooltip>
-
-                        <div className="w-10 h-[2px] bg-black opacity-10" />
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <button className="w-12 h-12 flex items-center justify-center border-2 border-black rounded-2xl hover:bg-slate-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none transition-all">
-                                    <Monitor size={20} />
-                                </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="font-['Archivo'] font-bold">Format</TooltipContent>
+                            <TooltipContent side="right">Capas</TooltipContent>
                         </Tooltip>
                     </aside>
 
-                    {/* CENTRAL CANVAS AREA */}
-                    <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#FAFAFA] relative overflow-auto">
-                        
-                        {/* Format Bar (Moved here) */}
-                        <div className="mb-8 flex bg-white p-1.5 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-30">
-                            {(['9:16', '1:1', '4:5'] as Format[]).map((f) => (
-                                <button 
-                                    key={f} 
-                                    onClick={() => setFormat(f)} 
-                                    className={`px-6 py-2 rounded-xl text-[10px] font-['Archivo'] font-black uppercase tracking-widest transition-all ${format === f ? 'bg-black text-white shadow-lg' : 'text-slate-400 hover:text-black'}`}>
-                                    {f === '9:16' ? 'Story' : f === '1:1' ? 'Square' : 'Feed'}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Front-Facing Canvas Frame */}
-                        <div className="relative group flex items-center justify-center">
-                            {/* Color Staple Panel (Integrated) */}
-                            {colors.length > 0 && (
-                                <div 
-                                    className="absolute top-[-30px] left-1/2 -translate-x-1/2 z-40 bg-white border-2 border-black px-4 py-2 flex gap-3 rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-move hover:scale-105 transition-transform"
-                                    onMouseDown={() => handleDragStart('palette')}
-                                    onTouchStart={() => handleDragStart('palette')}
-                                >
-                                    {colors.map((color, idx) => (
-                                        <div 
-                                            key={idx} 
-                                            className="w-5 h-5 rounded-full border-2 border-black"
-                                            style={{ backgroundColor: color }}
-                                            onClick={(e) => { e.stopPropagation(); setSelectedColor(color); }}
-                                        />
+                    {activeTab === 'color-studio' && (
+                        <div className="flex-1 flex flex-col md:flex-row relative">
+                            <div className="flex-1 flex flex-col items-center justify-center relative bg-[#F5F5F7] py-8 overflow-auto">
+                                <div className="mb-6 flex gap-2 z-30 bg-white/80 backdrop-blur-md p-1 rounded-full border border-[#E5E5E7] shadow-sm">
+                                    {(['9:16', '1:1', '4:5'] as Format[]).map((f) => (
+                                        <button key={f} onClick={() => setFormat(f)} className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${format === f ? 'bg-primary text-white shadow-md' : 'text-[#86868B] hover:bg-white'}`}>{f}</button>
                                     ))}
                                 </div>
-                            )}
 
-                            {/* The Visual Block */}
-                            <div 
-                                ref={canvasRef} 
-                                className={`relative bg-white border-2 border-black shadow-[16px_16px_0px_0px_rgba(0,0,0,0.05)] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${format === '9:16' ? 'h-[75vh] aspect-[9/16]' : format === '1:1' ? 'h-[60vh] aspect-square' : 'h-[70vh] aspect-[4/5]'} min-h-[400px]`}
-                            >
-                                {image ? (
-                                    <img src={image} className="absolute inset-0 w-full h-full object-cover" />
-                                ) : (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center m-12 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => fileInputRef.current?.click()}>
-                                        <Upload size={40} className="mb-4 text-slate-300" />
-                                        <p className="text-[10px] font-['Archivo'] font-bold uppercase tracking-[0.2em] text-slate-400">Upload Base Image</p>
-                                    </div>
-                                )}
-                                
-                                {/* Grid Sub-layer */}
-                                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-                                {/* Overlays */}
-                                {overlays.map((o) => (
-                                    <div
-                                        key={o.id}
-                                        className={`absolute cursor-move z-30 ${draggingOverlayId === o.id ? 'outline-2 outline-dashed outline-black' : ''}`}
-                                        style={{ left: `${o.position.x}%`, top: `${o.position.y}%`, transform: 'translate(-50%, -50%)' }}
-                                        onMouseDown={() => handleDragStart(o.id)}
-                                        onTouchStart={() => handleDragStart(o.id)}
-                                    >
-                                        <img src={o.dataUrl} className="max-w-[250px] pointer-events-none" style={{ transform: `scale(${o.scale})` }} />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* RIGHT SIDEBAR (Offset Shadows System) */}
-                    <aside className="w-80 border-l-2 border-black bg-white flex flex-col p-8 gap-8 z-30 overflow-auto">
-                        
-                        {/* Section: Palette */}
-                        <div>
-                            <h3 className="text-[10px] font-['Silkscreen'] uppercase tracking-[0.2em] mb-6 text-black">Color Studio</h3>
-                            <div className="space-y-3">
-                                {colors.map((color, idx) => (
+                                <div className="relative">
                                     <div 
-                                        key={idx} 
-                                        className="group relative flex items-center gap-4 p-3 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-                                        onClick={() => { navigator.clipboard.writeText(color); toast.success(`Copied ${color}`); }}
+                                        ref={canvasRef} 
+                                        className={`relative bg-white border border-white shadow-[0_40px_100px_rgba(0,0,0,0.08)] rounded-[40px] overflow-hidden ${format === '9:16' ? 'aspect-[9/16]' : format === '1:1' ? 'aspect-square' : 'aspect-[4/5]'} w-[300px] sm:w-[440px] transition-all`}
                                     >
-                                        <div className="w-10 h-10 rounded-lg border-2 border-black shrink-0 shadow-sm" style={{ backgroundColor: color }} />
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-['Archivo'] font-black uppercase text-slate-400 leading-none mb-1">Hex Code</span>
-                                            <span className="font-['Archivo'] font-bold text-sm tracking-tight">{color}</span>
+                                        {image ? <img src={image} className="absolute inset-0 w-full h-full object-cover" /> : (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center m-8 border-2 border-dashed border-slate-200 rounded-[32px] cursor-pointer bg-slate-50" onClick={() => fileInputRef.current?.click()}>
+                                                <Upload size={40} className="mb-4 text-slate-300" />
+                                                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Upload Image</span>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Staple Palette: Refined Airy Circles */}
+                                        {colors.length > 0 && (
+                                            <div 
+                                                className="absolute z-40 flex flex-col gap-4 cursor-move p-4"
+                                                style={{ top: `${palettePosition.y}%`, left: `${palettePosition.x}%`, transform: 'translate(-50%, -50%)' }}
+                                                onMouseDown={() => handleDragStart('palette')}
+                                                onTouchStart={() => handleDragStart('palette')}
+                                            >
+                                                {colors.map((color, idx) => (
+                                                    <div 
+                                                        key={idx} 
+                                                        className="w-14 h-14 sm:w-16 sm:h-16 border-2 border-white/50 rounded-full shadow-2xl hover:scale-110 transition-transform cursor-pointer"
+                                                        style={{ backgroundColor: color }}
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedColor(color); }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {overlays.map((o) => (
+                                            <div 
+                                                key={o.id} 
+                                                className={`absolute cursor-move z-30 ${draggingOverlayId === o.id ? 'outline-2 outline-dashed outline-primary p-1' : ''}`} 
+                                                style={{ left: `${o.position.x}%`, top: `${o.position.y}%`, transform: 'translate(-50%, -50%)' }} 
+                                                onMouseDown={() => handleDragStart(o.id)} 
+                                                onTouchStart={() => handleDragStart(o.id)}
+                                            >
+                                                <img src={o.dataUrl} className="max-w-[200px] sm:max-w-[300px] pointer-events-none" style={{ transform: `scale(${o.scale})` }} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Sidebar Right (Airy System) */}
+                            <aside className="hidden md:flex w-80 border-l border-[#E5E5E7] bg-white flex flex-col p-8 gap-8 z-30">
+                                <div>
+                                    <h3 className="text-[10px] uppercase font-bold tracking-[0.2em] mb-6 text-slate-400">Visual DNA</h3>
+                                    <div className="space-y-3">
+                                        {colors.map((color, idx) => (
+                                            <div key={idx} className="flex items-center gap-4 p-3 bg-[#FDFCFB] border border-[#E5E5E7] rounded-2xl hover:border-primary/30 transition-all cursor-pointer group" onClick={() => setSelectedColor(color)}>
+                                                <div className="w-10 h-10 border border-[#E5E5E7] rounded-lg shadow-sm" style={{ backgroundColor: color }} />
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase mb-1">HEX</span>
+                                                    <span className="font-['Archivo'] font-bold text-sm">{color}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex-1 flex flex-col">
+                                    <h3 className="text-[10px] uppercase font-bold tracking-[0.2em] mb-6 text-slate-400">Inventory</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {overlays.map(o => (
+                                            <div key={o.id} className="aspect-square bg-slate-50 border border-[#E5E5E7] rounded-2xl p-3 relative group hover:bg-white transition-all">
+                                                <img src={o.dataUrl} className="w-full h-full object-contain" />
+                                                <button className="absolute top-2 right-2 w-6 h-6 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[#E5E5E7]" onClick={() => setOverlays(prev => prev.filter(ov => ov.id !== o.id))}><Trash2 size={10}/></button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </aside>
+                        </div>
+                    )}
+
+                    {activeTab === 'font-studio' && (
+                        <div className="flex-1 flex flex-col md:flex-row z-20 relative bg-white">
+                            <div className="w-full md:w-80 border-b md:border-b-0 md:border-r border-[#E5E5E7] p-8 flex flex-col gap-6">
+                                <h3 className="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-400">Type Vault</h3>
+                                <Button variant="outline" className="rounded-2xl h-12" onClick={() => fontInputRef.current?.click()}><Plus size={16}/> Load .TTF</Button>
+                                <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto pb-4 pr-2">
+                                    {storedFonts.map((f) => (
+                                        <div key={f.id} onClick={() => setSelectedFontId(f.id)} className={`p-4 border border-[#E5E5E7] rounded-2xl cursor-pointer shrink-0 w-40 md:w-full transition-all ${selectedFontId === f.id ? 'bg-primary text-white' : 'bg-[#FDFCFB] hover:border-primary/30'}`}>
+                                            <p className="text-[9px] font-bold uppercase truncate opacity-60">{f.name}</p>
+                                            <p style={{ fontFamily: f.id }} className="text-2xl truncate pt-2">Aa 123</p>
                                         </div>
-                                        <Copy size={12} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex-1 p-8 sm:p-12 flex flex-col items-center justify-center bg-[#F5F5F7]">
+                                <div className="bg-white w-full max-w-2xl p-10 border border-[#E5E5E7] rounded-[40px] shadow-airy flex flex-col gap-10">
+                                    <div className="bg-checkered h-64 rounded-3xl flex items-center justify-center p-10 relative overflow-hidden border border-[#E5E5E7]">
+                                        <p style={{ fontFamily: selectedFontId || 'sans-serif', color: stickerColor, fontSize: '5rem', textAlign: 'center' }}>{stickerText}</p>
+                                        <div className="absolute top-4 left-4 bg-primary text-white text-[8px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">Preview</div>
                                     </div>
-                                ))}
-                                {colors.length === 0 && (
-                                    <div className="p-8 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center gap-2">
-                                        <Palette size={20} className="text-slate-200" />
-                                        <p className="text-[9px] font-['Archivo'] font-bold text-slate-300 uppercase tracking-widest text-center leading-relaxed">Extract palette from image</p>
+                                    <div className="space-y-6">
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[10px] uppercase font-bold text-slate-400">Content</label>
+                                            <Input value={stickerText} onChange={(e) => setStickerText(e.target.value)} className="h-14 bg-slate-50 border-none rounded-2xl text-lg font-semibold" />
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <Button variant="outline" onClick={() => setStickerColor('white')} className={`flex-1 rounded-xl ${stickerColor === 'white' ? 'bg-primary text-white' : ''}`}>Light</Button>
+                                            <Button variant="outline" onClick={() => setStickerColor('black')} className={`flex-1 rounded-xl ${stickerColor === 'black' ? 'bg-primary text-white' : ''}`}>Dark</Button>
+                                        </div>
+                                        <Button className="w-full h-16 bg-[#1D1D1F] text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-black" onClick={handleCopySticker}><ClipboardPaste size={20} className="mr-2" /> Copy to Studio</Button>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         </div>
-
-                        {/* Section: Stickers Inventory */}
-                        <div className="flex-1 flex flex-col">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-[10px] font-['Silkscreen'] uppercase tracking-[0.2em] text-black">Inventory</h3>
-                                <button className="w-6 h-6 border-2 border-black rounded-md flex items-center justify-center hover:bg-slate-50" onClick={() => setActiveTab('font-studio')}>
-                                    <Plus size={14} />
-                                </button>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                                {overlays.map(o => (
-                                    <div key={o.id} className="aspect-square bg-white border-2 border-black rounded-2xl p-3 relative group hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
-                                        <img src={o.dataUrl} className="w-full h-full object-contain" />
-                                        <button 
-                                            className="absolute top-[-8px] right-[-8px] w-6 h-6 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border-2 border-black"
-                                            onClick={() => setOverlays(prev => prev.filter(ov => ov.id !== o.id))}
-                                        >
-                                            <Trash2 size={10}/>
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Export Hint Card */}
-                        <div className="bg-black p-6 rounded-[24px] text-white">
-                            <p className="text-[10px] font-['Archivo'] font-bold uppercase tracking-widest leading-relaxed opacity-60 mb-2">Editor Tip</p>
-                            <p className="text-xs font-['Archivo'] leading-relaxed">Drag the palette staple over your image to analyze contrast in real-time.</p>
-                        </div>
-                    </aside>
+                    )}
                 </main>
 
+                {/* Mobile Menu Airy */}
+                <footer className="md:hidden h-20 border-t border-[#E5E5E7] bg-white/80 backdrop-blur-xl sticky bottom-0 z-50 flex items-center px-6 overflow-x-auto gap-6 no-scrollbar">
+                    <button onClick={() => setActiveTab('color-studio')} className={`flex flex-col items-center gap-1 shrink-0 ${activeTab === 'color-studio' ? 'text-primary' : 'text-slate-300'}`}><Palette size={20}/><span className="text-[8px] font-bold uppercase">Studio</span></button>
+                    <button onClick={() => setActiveTab('font-studio')} className={`flex flex-col items-center gap-1 shrink-0 ${activeTab === 'font-studio' ? 'text-primary' : 'text-slate-300'}`}><Type size={20}/><span className="text-[8px] font-bold uppercase">Fonts</span></button>
+                    <div className="w-0.5 h-10 bg-black opacity-10 shrink-0" />
+                    <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1 shrink-0 text-slate-400"><ImageIcon size={20}/><span className="text-[8px] font-bold uppercase">Upload</span></button>
+                    <div className="w-0.5 h-10 bg-black opacity-10 shrink-0" />
+                    <div className="flex gap-3 shrink-0 pr-6">
+                        {colors.map((c, i) => <div key={i} onClick={() => setSelectedColor(c)} className="w-10 h-10 rounded-full border border-white shadow-md" style={{ backgroundColor: c }} />)}
+                    </div>
+                </footer>
+
+                <Dialog open={!!selectedColor} onOpenChange={(open) => !open && setSelectedColor(null)}>
+                    <DialogContent className="max-w-sm p-10 border-none rounded-[40px] bg-white shadow-2xl">
+                        <DialogHeader className="mb-8 text-center uppercase tracking-widest text-[10px] font-bold text-slate-400">Cromatic Analysis</DialogHeader>
+                        <div className="space-y-8 flex flex-col items-center">
+                            <div className="w-32 h-32 border border-white rounded-[32px] shadow-xl" style={{ backgroundColor: selectedColor || '' }} />
+                            <div className="flex gap-2 w-full">
+                                <Input value={selectedColor || ''} readOnly className="h-14 bg-slate-50 border-none rounded-2xl font-mono text-center flex-1" />
+                                <Button
+                                    onClick={() => { navigator.clipboard.writeText(selectedColor || ''); setCopiedColor(selectedColor); toast.success('Copiado'); setTimeout(() => setCopiedColor(null), 2000); }} 
+                                    className="w-14 h-14 bg-primary text-white rounded-2xl"
+                                >
+                                    {copiedColor === selectedColor ? <Check size={20} /> : <Copy size={20} />}
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <input ref={fontInputRef} type="file" accept=".ttf,.otf" className="hidden" onChange={handleFontUpload} />
             </div>
         </TooltipProvider>
     );
